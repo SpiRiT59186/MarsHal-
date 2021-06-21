@@ -1,46 +1,99 @@
-const Discord = require("discord.js");
-const ytdl = require("ytdl-core");
+﻿const Discord = require('discord.js');
+const fs = require('fs');
+const config = require('./config.json');
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
+var prefix = config.prefix;
 
-const Client = new Discord.Client;
+fs.readdir('./Commandes/', (error, f) => {
+    if (error) { return console.error(error); }
+        let commandes = f.filter(f => f.split('.').pop() === 'js');
+        if (commandes.length <= 0) { return console.log('Aucune commande trouvée !'); }
 
-const prefix = "+"
-
-Client.on("ready", () => {
-    console.log("bot opérationnel");
+        commandes.forEach((f) => {
+            let commande = require(`./Commandes/${f}`);
+            console.log(`${f} commande chargée !`);
+            client.commands.set(commande.help.name, commande);
+        });
 });
 
+fs.readdir('./Events/', (error, f) => {
+    if (error) { return console.error(error); }
+        console.log(`${f.length} events chargés`);
 
-Client.on("message", message => {
-    if(message.content.startsWith(prefix + "play")){
-        if(message.member.voice.channel){
-            message.member.voice.channel.join().then(connection => {
-                let args = message.content.split(" ");
+        f.forEach((f) => {
+            let events = require(`./Events/${f}`);
+            let event = f.split('.')[0];
+            client.on(event, events.bind(null, client));
+        });
+});
 
-                if(!args [1]){
-                    message.reply("Lien de la vidéo non ou mal mentionné.");
-                    connection.disconnect();
-                } 
-                else {    
-                    let dispatcher = connection.play(ytdl(args[1], { quality: "highestaudio" }));
-
-                     dispatcher.on("finish", () => {
-                        dispatcher.destroy();
-                        connection.disconnect();
-                    });
-
-                    dispatcher.on("error", err => {
-                        console.log("erreur de dispatcher : " + err);
-                    });
-                }    
-            }).catch(err => {
-                message.reply("Erreur lors de la connexion : " + err);
-            });    
-        }
-        else {
-            message.reply("Vous n'êtes pas connecté en vocal.");
-        }
-    }    
-});    
+client.login(config.token);
 
 
-Client.login(process.env.TOKEN);
+client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "bonjour a tous"){
+      message.channel.send('Bonjour a toi !')
+    }
+  })
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "bonsoir a vous"){
+      message.channel.send('bonsoir a toi !')
+    }
+  })
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "salut"){
+      message.channel.send('Salutation !')
+    }
+  })
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "comment ca va ?"){
+      message.channel.send('Bien et vous ? ')
+    }
+  })
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "comment ca va"){
+      message.channel.send('Bien et vous ? ')
+    }
+  })
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "bien"){
+      message.channel.send('ok')
+    }
+  })
+  
+  
+  //// insulte
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "tg"){
+      message.reply('les insultes !')
+    }
+  })
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "fdp"){
+      message.reply('les insultes !')
+    }
+  }) 
+  
+  client.on('message', message =>{
+    if(!message.guild || message.author.bot == true) return;
+    if(message.content.toLowerCase() == "ftg"){
+      message.reply('les insultes !')
+    }
+});
+
